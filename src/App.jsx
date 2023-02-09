@@ -1,5 +1,7 @@
-import { useReducer } from "react";
+import { useReducer, createContext, useContext } from "react";
 import "./App.css";
+
+const AppContext = createContext(); // variable name is capitalized because this hook creates a react component
 
 const initialState = {
   inputText: "",
@@ -56,6 +58,19 @@ function toDoReducer(state, action) {
   }
 }
 
+//notice the App component did not pass any props to this component! Could have been 20 levels down.
+function StateDisplay() {
+  const state = useContext(AppContext);
+  return (
+    <>
+      <div className="text-red-600 text-xl mb-5 uppercase">
+        Application State:{" "}
+      </div>
+      <div className="">{JSON.stringify(state)}</div>
+    </>
+  );
+}
+
 function App() {
   const [state, dispatch] = useReducer(toDoReducer, initialState);
 
@@ -83,86 +98,91 @@ function App() {
   ));
 
   return (
-    <div className="App">
-      <div className="text-red-600 text-3xl mb-5 uppercase">To Do List</div>
-      <form
-        className="form-control w-full max-w-md flex-row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (state.inputText === "") {
-            return;
-          }
-          dispatch({
-            type: "new_task",
-            task: state.inputText,
-            important: state.inputCheckbox,
-          });
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Add new task here..."
-          className="input input-sm input-bordered w-full max-w-md inline mx-2"
-          value={state.inputText}
-          onChange={(e) =>
-            dispatch({ type: "update_input_text", inputText: e.target.value })
-          }
-        />
-        Important?
-        <input
-          type="checkbox"
-          className="checkbox mx-2"
-          onChange={() =>
+    // here we are using the 'AppContext' React component created by createContext()
+    <AppContext.Provider value={state}>
+      <div className="">
+        <div className="text-red-600 text-3xl mb-5 uppercase">To Do List</div>
+        <form
+          className="form-control flex flex-row justify-center"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (state.inputText === "") {
+              return;
+            }
             dispatch({
-              type: "checkbox_toggle",
-              important: !state.inputCheckbox,
-            })
-          }
-          checked={state.inputCheckbox}
-        />
-        <input
-          type="submit"
-          value="Add A Task"
-          className="btn btn-outline btn-sm inline"
-        />
-      </form>
-      <div className="flex flex-row justify-center">
-        <label className="label cursor-pointer justify-center mt-3">
+              type: "new_task",
+              task: state.inputText,
+              important: state.inputCheckbox,
+            });
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Add new task here..."
+            className="input input-sm input-bordered w-full max-w-md inline mx-2"
+            value={state.inputText}
+            onChange={(e) =>
+              dispatch({ type: "update_input_text", inputText: e.target.value })
+            }
+          />
+          Important?
           <input
             type="checkbox"
-            className="toggle toggle-sm toggle-neutral"
+            className="checkbox mx-2"
             onChange={() =>
               dispatch({
-                type: "show_important_only",
-                value: !state.showImportantOnly,
+                type: "checkbox_toggle",
+                important: !state.inputCheckbox,
               })
             }
-            checked={state.showImportantOnly}
+            checked={state.inputCheckbox}
           />
-          &nbsp;
-          <span className="label-text mr-3">Show Important Only</span>
-        </label>
-        &nbsp;
-        <label className="label cursor-pointer justify-center mt-3">
           <input
-            type="checkbox"
-            className="toggle toggle-sm toggle-neutral"
-            onChange={() =>
-              dispatch({
-                type: "exclude_completed",
-                value: !state.excludeCompleted,
-              })
-            }
-            checked={state.excludeCompleted}
+            type="submit"
+            value="Add A Task"
+            className="btn btn-outline btn-sm inline"
           />
+        </form>
+        <div className="flex flex-row justify-center">
+          <label className="label cursor-pointer justify-center mt-3">
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-neutral"
+              onChange={() =>
+                dispatch({
+                  type: "show_important_only",
+                  value: !state.showImportantOnly,
+                })
+              }
+              checked={state.showImportantOnly}
+            />
+            &nbsp;
+            <span className="label-text mr-3">Show Important Only</span>
+          </label>
           &nbsp;
-          <span className="label-text mr-3">Exclude Completed</span>
-        </label>
-      </div>
+          <label className="label cursor-pointer justify-center mt-3">
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-neutral"
+              onChange={() =>
+                dispatch({
+                  type: "exclude_completed",
+                  value: !state.excludeCompleted,
+                })
+              }
+              checked={state.excludeCompleted}
+            />
+            &nbsp;
+            <span className="label-text mr-3">Exclude Completed</span>
+          </label>
+        </div>
 
-      <div className="divider" />
-      <ol>{tasks}</ol>
-    </div>
+        <div className="divider" />
+        <ol>{tasks}</ol>
+        <div className="divider" />
+        <StateDisplay />
+      </div>
+    </AppContext.Provider>
   );
 }
 
