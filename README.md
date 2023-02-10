@@ -1,3 +1,5 @@
 ## Practicing
 
-For this project, I am practicing the useReducer and useContext functions from React. I am also incorporating styles from TailwindCSS & DaisyUI.
+I started this project to practice the useReducer() and useContext() functions from React.
+I ended up also incorporating useRef() to focus on Add new task input following a form submission.
+Also incorporated styles from TailwindCSS & DaisyUI.

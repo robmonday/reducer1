@@ -1,4 +1,4 @@
-import { useReducer, createContext, useContext } from "react";
+import { useReducer, createContext, useContext, useRef } from "react";
 import "./App.css";
 
 const AppContext = createContext(); // variable name is capitalized because this hook creates a react component
@@ -64,7 +64,7 @@ function StateDisplay() {
   return (
     <>
       <div className="text-red-600 text-xl mb-5 uppercase">
-        Application State:{" "}
+        Application State:
       </div>
       <div className="">{JSON.stringify(state)}</div>
     </>
@@ -73,6 +73,7 @@ function StateDisplay() {
 
 function App() {
   const [state, dispatch] = useReducer(toDoReducer, initialState);
+  const textInputRef = useRef(null);
 
   let tasksToMap = state.list;
 
@@ -106,6 +107,7 @@ function App() {
           className="form-control flex flex-row justify-center"
           onSubmit={(e) => {
             e.preventDefault();
+            textInputRef.current.focus();
             if (state.inputText === "") {
               return;
             }
@@ -124,6 +126,7 @@ function App() {
             onChange={(e) =>
               dispatch({ type: "update_input_text", inputText: e.target.value })
             }
+            ref={textInputRef}
           />
           Important?
           <input
